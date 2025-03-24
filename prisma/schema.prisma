@@ -1,20 +1,54 @@
+generator client {
+  provider        = "prisma-client-js"
+  previewFeatures = ["aggregateApi"]
+}
+
 datasource db {
   provider = "postgresql"
   url      = env("DATABASE_URL")
 }
 
-// TODO: define fields and relations
-model User {
+model USERS {
+  U_USER_ID       Int      @id @default(autoincrement())
+  U_EMAIL         String   @unique
+  U_PASSWORD      String
+  U_ROLE          UserRole @default(USER)
+  U_CREATED_AT    DateTime @default(now())
+  U_UPDATED_AT    DateTime @updatedAt
+  U_PHONE_NUMBER  String
+  U_ADDRESS_1     String
+  U_ADDRESS_2     String
+  U_DATE_OF_BIRTH DateTime
+  U_FIRST_NAME    String
+  U_LAST_NAME     String
+  U_IS_VALID      Boolean  @default(true)
+
+  TUTORS TUTORS[]
+  ANALYISTS ANALYISTS[]
+  // CONTACT_REQUESTS CONTACT_REQUESTS[]
+  // APROVED_CHANGES APROVED_CHANGES[]
 }
 
-// TODO: define fields and relations
-model Course {
+enum UserRole {
+  TUTOR
+  ANALYIST
+  ADMIN
+  USER
 }
 
-// TODO: define fields and relations
-model Test {
+model TUTORS {
+  T_TUTOR_ID                Int      @id @default(autoincrement())
+  T_USER_ID                 Int
+  user                      USERS    @relation(fields: [T_USER_ID], references: [U_USER_ID])
+  T_IS_VERIFIED             Boolean  @default(false)
+  T_EMERGENCY_PHONE_CONTACT String
+
 }
 
-// TODO: define fields and relations
-model TestResult {
+model ANALYISTS {
+  AN_ANALYST_ID  Int      @id @default(autoincrement())
+  AN_USER_ID     Int
+  user           USERS    @relation(fields: [AN_USER_ID], references: [U_USER_ID]) 
+  AN_CERT_NUMBER String
+  AN_IS_VERIFIED Boolean  @default(false)
 }

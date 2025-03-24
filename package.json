@@ -7,7 +7,12 @@
     "@hapi/hapi": "^19.1.1",
     "@hapi/joi": "^17.1.1",
     "@prisma/client": "2.3.0",
-    "date-fns": "^2.15.0"
+    "date-fns": "^2.15.0",
+    "dotenv": "^16.4.7",
+    "hapi-auth-jwt2": "^11.0.0",
+    "hapi-pino": "^12.1.0",
+    "joi": "^17.13.3",
+    "jsonwebtoken": "^9.0.2"
   },
   "devDependencies": {
     "@prisma/cli": "2.3.0",
@@ -24,7 +29,7 @@
     "dev": "ts-node-dev --respawn ./src/index.ts",
     "seed": "ts-node ./src/seed.ts",
     "test": "jest",
-    "postgres:start": "docker-compose up -d",
+    "postgres:start": "docker compose up -d",
     "migrate:save": "prisma migrate --experimental save",
     "migrate:up": "prisma migrate --experimental up --auto-approve --create-db",
     "prisma:generate": "prisma generate"

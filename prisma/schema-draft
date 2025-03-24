@@ -1,0 +1,130 @@
+
+
+model ANALYISTS {
+  AN_ANALYST_ID  Int     @id @default(autoincrement())
+  AN_USER_ID     Int
+  AN_CERT_NUMBER String
+  AN_IS_VERIFIED Boolean @default(false)
+
+  an_user USERS @relation(fields: [AN_USER_ID], references: [U_USER_ID])
+}
+
+model EVALUATIONS {
+  EV_EVALUATION_ID    Int      @id @default(autoincrement())
+  EV_ATHLETE_ID       Int
+  EV_ANALYST_ID       Int
+  EV_IS_METRICS_VALID Boolean  @default(false)
+  EV_METRICS          String
+  EV_REPORT_ENCRYPTED String
+  EV_EVALUATION_DATE  DateTime
+
+  // ev_athlete ATHLETES @relation(fields: [EV_ATHLETE_ID], references: [A_ATHLETE_ID])
+  // ev_analyst ANALYISTS @relation(fields: [EV_ANALYST_ID], references: [AN_ANALYST_ID])
+}
+
+model ATHLETES {
+  A_ATHLETE_ID    Int     @id @default(autoincrement())
+  A_HEIGHT        Float
+  A_WEIGHT        Float
+  A_DATE_BIRTH    DateTime
+  A_SCHOOL_GRADE  Int
+  A_SCHOOL_GPA    Float
+  A_BIO           String
+
+  a_sports ATHLETE_SPORTS[]
+}
+
+model ATHLETE_SPORTS {
+  ASP_ATHLETE_SPORTS_ID Int @id @default(autoincrement())
+  ASP_SPORTS_NAME String
+  ASP_ATHLETE_SPORT_INFO String
+
+  a_athlete ATHLETES @relation(fields: [ASP_ATHLETE_ID], references: [A_ATHLETE_ID])
+}
+
+model ATHLETE_TUTOR_RELATIONSHIP {
+  TAF_RELATIONSHIP_ID                Int     @id @default(autoincrement())
+  TAF_ATHLETE_ID                     Int
+  TAF_TUTOR_ID                       Int
+  TAF_ATHLETE_COUNT                  Int
+  ATR_CONCENT_CREATION_DATE          DateTime
+  ATR_CONCENT_DOCUMENT_URL           String
+  ATR_CONCENT_MODIFIED_DATE          DateTime
+  ATR_GUARDIAN_RELATIONSHIP          String
+}
+
+model USER_SEARCH_FILTER {
+  USF_SEARCH_FILTER_ID Int     @id @default(autoincrement())
+  USF_USER_ID          Int
+  USF_PRIVILEDGE      Priviledge
+  USF_SEARCH_PARAMS    String
+  USF_CREATED_AT       DateTime @default(now())
+}
+
+enum Priviledge {
+  ADMIN
+  USER
+}
+
+model CONTACT_REQUESTS {
+  CR_REQUEST_ID       Int     @id @default(autoincrement())
+  CR_RECRUITER_ID     Int
+  CR_ATHLETE_ID      Int
+  CR_ANALYSTS_ID     Int
+  CR_STATUS           Status
+  CR_REQUESTED_AT    DateTime @default(now())
+  CR_MESSAGE         String
+}
+
+enum Status {
+  PENDING
+  ACCEPTED
+  REJECTED
+}
+
+model APROVED_CHANGES {
+  ACC_ID                Int     @id @default(autoincrement())
+  ACC_APPROVED_BY       Int
+  ACC_CHANGE_BY         Int
+  ACC_CHANGE_TO         String
+  ACC_CREATION_DATE    DateTime @default(now())
+  ACC_APPROVED_DATE    DateTime
+  ACC_MODIFICATIONS    String
+  ACC_TIMEOUT          Boolean @default(false)
+}
+
+model COMPETITIONS {
+  C_COMPETITION_ID        Int     @id @default(autoincrement())
+  C_COMPETITION_NAME      String
+  C_EVENT_DATE            DateTime
+  C_LOCATION               String
+  C_ORGANIZER              String
+  C_DESCRIPTION            String
+  C_IS_ACTIVE              Boolean @default(true)
+  C_CREATED_AT             DateTime @default(now())
+  C_UPDATED_AT             DateTime @updatedAt
+}
+
+model ADMINS {
+  AM_ADMIN_ID Int @id @default(autoincrement())
+  AM_USER_ID Int
+  AM_EMPLOYEE_ID Int
+  AM_ACCESS_LEVEL AccessLevel
+  AM_JOB_TITLE String
+  AM_CREATED_AT DateTime @default(now())
+  AM_UPDATED_AT DateTime @updatedAt
+}
+
+enum AccessLevel {
+  ADMIN
+  USER
+}
+
+model ADMIN_REPORTS {
+  AR_ADMIN_REPORT_ID Int @id @default(autoincrement())
+  AR_REPORTED_USER_ID Int
+  AR_CHECKED_BY_ADMIN_ID Int
+  AR_IS_PROFILE_VALID Boolean @default(false)
+  AR_IS_METRICS_VALID Boolean @default(false)
+  AR_IS_DOCS_VALID Boolean @default(false)
+}
