@@ -4,6 +4,7 @@ import prisma from "./plugins/prisma";
 import users from "./plugins/users";
 import athletes from "./plugins/athletes";
 import tutors from "./plugins/tutors";
+import competitions from "./plugins/competitions";
 
 const server: Hapi.Server = Hapi.server({
   port: process.env.PORT || 3000,
@@ -11,9 +12,8 @@ const server: Hapi.Server = Hapi.server({
 });
 
 export async function createServer(): Promise<Hapi.Server> {
-  await server.register([status, prisma, users, athletes, tutors]);
+  await server.register([status, prisma, users, athletes, tutors, competitions]);
   await server.initialize();
-
   return server;
 }
 
