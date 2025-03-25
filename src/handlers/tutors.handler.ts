@@ -5,7 +5,7 @@ const getTutorsHandler = async (
   request: Hapi.Request,
   h: Hapi.ResponseToolkit
 ) => {
-  const { prisma } = request.server.app;
+
   try {
     return h.response({
         message: 'Not Implemented yet'
@@ -15,4 +15,4 @@ const getTutorsHandler = async (
   }
 };
 
-export default { getTutorsHandler };
+export default getTutorsHandler;

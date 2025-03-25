@@ -5,14 +5,14 @@ const getAthletesHandler = async (
   request: Hapi.Request,
   h: Hapi.ResponseToolkit
 ) => {
-  const { prisma } = request.server.app;
+  
   try {
     return h.response({
         message: 'Not Implemented yet'
     }).code(200)
   } catch (err) {
-    return Boom.badImplementation("failed to get tutors");
+    return Boom.badImplementation("failed to get athletes");
   }
 };
 
-export default { getTuto    sHandler };
+export default getAthletesHandler;
