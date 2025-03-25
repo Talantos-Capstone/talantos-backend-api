@@ -1,0 +1,302 @@
+// This is your Prisma schema file,
+// learn more about it in the docs: https://pris.ly/d/prisma-schema
+
+// Looking for ways to speed up your queries, or scale easily with your serverless or edge functions?
+// Try Prisma Accelerate: https://pris.ly/cli/accelerate-init
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+// =============================================================================
+// Tutorial schema I found as baseline
+// =============================================================================
+
+model User {
+  id        Int    @id @default(autoincrement())
+  email     String @unique
+  firstName String
+  lastName  String
+  social    Json?
+
+  // Relation fields
+  courses     CourseEnrollment[]
+  testResults TestResult[]       @relation(name: "results")
+  testsGraded TestResult[]       @relation(name: "graded")
+}
+
+model Course {
+  id            Int     @id @default(autoincrement())
+  name          String
+  courseDetails String?
+
+  // Relation fields
+  members CourseEnrollment[]
+  tests   Test[]
+}
+
+model CourseEnrollment {
+  createdAt DateTime @default(now())
+  role      UserRole
+
+  // Relation Fields
+  userId   Int
+  courseId Int
+  user     User   @relation(fields: [userId], references: [id])
+  course   Course @relation(fields: [courseId], references: [id])
+
+  @@id([userId, courseId])
+  @@index([userId, role])
+}
+
+model Test {
+  id        Int      @id @default(autoincrement())
+  updatedAt DateTime @updatedAt
+  name      String
+  date      DateTime
+
+  // Relation Fields
+  courseId    Int
+  course      Course       @relation(fields: [courseId], references: [id])
+  testResults TestResult[]
+}
+
+model TestResult {
+  id        Int      @id @default(autoincrement())
+  createdAt DateTime @default(now())
+  result    Int // Percentage precise to one decimal point represented as `result * 10^-1`
+
+  // Relation Fields
+  studentId Int
+  student   User @relation(name: "results", fields: [studentId], references: [id])
+  graderId  Int
+  gradedBy  User @relation(name: "graded", fields: [graderId], references: [id])
+  testId    Int
+  test      Test @relation(fields: [testId], references: [id])
+}
+
+enum UserRole {
+  STUDENT
+  TEACHER
+}
+
+// =============================================================================
+// Talantos Actual Schema model
+// =============================================================================
+
+enum BaseUserRole {
+  TUTOR
+  ANALYIST
+  ADMIN
+  USER
+}
+
+enum Status {
+  PENDING
+  ACCEPTED
+  REJECTED
+  IN_PROGRESS
+  COMPLETED
+  CANCELED
+}
+
+model USERS {
+  U_USER_ID       Int          @id @default(autoincrement())
+  U_EMAIL         String       @unique
+  U_PASSWORD      String
+  U_ROLE          BaseUserRole @default(USER)
+  U_CREATED_AT    DateTime     @default(now())
+  U_UPDATED_AT    DateTime     @updatedAt
+  U_PHONE_NUMBER  String
+  U_ADDRESS_1     String
+  U_ADDRESS_2     String
+  U_DATE_OF_BIRTH DateTime
+  U_FIRST_NAME    String
+  U_LAST_NAME     String
+  U_IS_VALID      Boolean      @default(true)
+
+  tutors          TUTORS[]
+  admins          ADMINS[]
+  analysts        ANALYISTS[]
+  recruiters      RECRUITERS[]
+  searchFilters   USER_SEARCH_FILTER[]
+  APROVED_CHANGES APROVED_CHANGES[]
+}
+
+model ATHLETES {
+  A_ATHLETE_ID   Int      @id @default(autoincrement())
+  A_HEIGHT       Float
+  A_WEIGHT       Float
+  A_DATE_BIRTH   DateTime
+  A_SCHOOL_GRADE Int
+  A_SCHOOL_GPA   Float
+  A_BIO          String
+
+  ATHLETE_COMPETITIONS       ATHLETE_COMPETITIONS[]
+  ATHLETE_TUTOR_RELATIONSHIP ATHLETE_TUTOR_RELATIONSHIP[]
+  EVALUATIONS                EVALUATIONS[]
+  ATHLETE_SPORTS             ATHLETE_SPORTS[]
+  CONTACT_REQUESTS           CONTACT_REQUESTS[]
+}
+
+model ATHLETE_SPORTS {
+  ASP_ATHLETE_SPORTS_ID  Int    @id @default(autoincrement())
+  ASP_SPORTS_NAME        String
+  ASP_ATHLETE_SPORT_INFO String
+
+  ATHLETES ATHLETES[]
+}
+
+model COMPETITIONS {
+  C_COMPETITION_ID   Int      @id @default(autoincrement())
+  C_COMPETITION_NAME String   @unique
+  C_EVENT_DATE       DateTime
+  C_LOCATION         String
+  C_ORGANIZER        String
+  C_DESCRIPTION      String
+  C_IS_ACTIVE        Boolean  @default(true)
+  C_CREATED_AT       DateTime @default(now())
+  C_UPDATED_AT       DateTime @updatedAt
+
+  ATHLETE_COMPETITIONS ATHLETE_COMPETITIONS[]
+}
+
+model ATHLETE_COMPETITIONS {
+  AC_ATHLETE_COMPETITION_ID String   @id @default(uuid())
+  AC_ATHLETE_ID             Int      @unique
+  AC_COMPETITION_ID         Int
+  AC_PERFORMANCE_METRICS    Json
+  AC_RESULTS                Json
+  AC_CREATED_AT             DateTime @default(now())
+  AC_UPDATED_AT             DateTime @updatedAt
+
+  athlete     ATHLETES     @relation(fields: [AC_ATHLETE_ID], references: [A_ATHLETE_ID])
+  competition COMPETITIONS @relation(fields: [AC_COMPETITION_ID], references: [C_COMPETITION_ID])
+}
+
+model USER_SEARCH_FILTER {
+  USF_SEARCH_FILTER_ID Int          @id @default(autoincrement())
+  USF_USER_ID          Int
+  USF_PRIVILEDGE       BaseUserRole
+  USF_SEARCH_PARAMS    String
+  USF_CREATED_AT       DateTime     @default(now())
+
+  user USERS? @relation(fields: [USF_USER_ID], references: [U_USER_ID])
+}
+
+model ADMINS {
+  AM_ADMIN_ID     Int      @id @default(autoincrement())
+  AM_USER_ID      Int      @unique
+  AM_EMPLOYEE_ID  Int
+  AM_ACCESS_LEVEL String
+  AM_JOB_TITLE    String
+  AM_CREATED_AT   DateTime @default(now())
+  AM_UPDATED_AT   DateTime @updatedAt
+
+  user            USERS             @relation(fields: [AM_USER_ID], references: [U_USER_ID])
+  APROVED_CHANGES APROVED_CHANGES[]
+}
+
+model ADMIN_REPORTS {
+  AR_ADMIN_REPORT_ID     Int     @id @default(autoincrement())
+  AR_REPORTED_USER_ID    Int
+  AR_CHECKED_BY_ADMIN_ID Int
+  AR_IS_PROFILE_VALID    Boolean @default(false)
+  AR_IS_METRICS_VALID    Boolean @default(false)
+  AR_IS_DOCS_VALID       Boolean @default(false)
+  
+}
+
+model TUTORS {
+  T_TUTOR_ID                Int     @id @default(autoincrement())
+  T_USER_ID                 Int     @unique
+  T_IS_VERIFIED             Boolean @default(false)
+  T_EMERGENCY_PHONE_CONTACT String?
+
+  ATHLETE_TUTOR_RELATIONSHIP ATHLETE_TUTOR_RELATIONSHIP[]
+  user                       USERS                        @relation(fields: [T_USER_ID], references: [U_USER_ID])
+}
+
+model ANALYISTS {
+  AN_ANALYST_ID  Int     @id @default(autoincrement())
+  AN_USER_ID     Int     @unique
+  AN_CERT_NUMBER String
+  AN_IS_VERIFIED Boolean @default(false)
+
+  user USERS @relation(fields: [AN_USER_ID], references: [U_USER_ID])
+
+  CONTACT_REQUESTS CONTACT_REQUESTS[]
+  EVALUATIONS EVALUATIONS[]
+}
+
+model EVALUATIONS {
+  EV_EVALUATION_ID    Int      @id @default(autoincrement())
+  EV_ATHLETE_ID       Int
+  EV_ANALYST_ID       Int
+  EV_IS_METRICS_VALID Boolean  @default(false)
+  EV_METRICS          String?
+  EV_EVALUATION_DATE  DateTime
+
+  athlete ATHLETES  @relation(fields: [EV_ATHLETE_ID], references: [A_ATHLETE_ID])
+  analyst ANALYISTS @relation(fields: [EV_ANALYST_ID], references: [AN_ANALYST_ID])
+}
+
+model CONTACT_REQUESTS {
+  CR_REQUEST_ID   Int      @id @default(autoincrement())
+  CR_RECRUITER_ID Int
+  CR_ATHLETE_ID   Int
+  CR_ANALYSTS_ID  Int?
+  CR_STATUS       Status
+  CR_REQUESTED_AT DateTime @default(now())
+  CR_MESSAGE      String
+
+  recruiter RECRUITERS @relation(fields: [CR_RECRUITER_ID], references: [RE_RECRUITER_ID])
+  athlete   ATHLETES   @relation(fields: [CR_ATHLETE_ID], references: [A_ATHLETE_ID])
+  analyst   ANALYISTS? @relation(fields: [CR_ANALYSTS_ID], references: [AN_ANALYST_ID])
+}
+
+model APROVED_CHANGES {
+  ACC_ID            Int      @id @default(autoincrement())
+  ACC_APPROVED_BY   Int?
+  ACC_CHANGE_BY     Int
+  ACC_CHANGE_TO     String
+  ACC_CREATION_DATE DateTime @default(now())
+  ACC_APPROVED_DATE DateTime
+  ACC_MODIFICATIONS String
+  ACC_TIMEOUT       Boolean  @default(false)
+
+  admin ADMINS? @relation(fields: [ACC_APPROVED_BY], references: [AM_USER_ID])
+  user  USERS   @relation(fields: [ACC_CHANGE_BY], references: [U_USER_ID])
+}
+
+model RECRUITERS {
+  RE_RECRUITER_ID Int     @id @default(autoincrement())
+  RE_USER_ID      Int     @unique
+  RE_UNIVERSITY   String
+  RE_POSITION     String
+  RE_IS_VERIFIED  Boolean @default(false)
+
+  CONTACT_REQUESTS CONTACT_REQUESTS[]
+  user             USERS              @relation(fields: [RE_USER_ID], references: [U_USER_ID])
+}
+
+model ATHLETE_TUTOR_RELATIONSHIP {
+  ATR_RELATIONSHIP_ID       Int      @id @default(autoincrement())
+  ATR_ATHLETE_ID            Int
+  ATR_TUTOR_ID              Int
+  ATR_ATHLETE_COUNT         Int
+  ATR_CONCENT_CREATION_DATE DateTime
+  ATR_CONCENT_DOCUMENT_URL  String
+  ATR_CONCENT_MODIFIED_DATE DateTime
+  ATR_GUARDIAN_RELATIONSHIP String
+
+  athlete ATHLETES @relation(fields: [ATR_ATHLETE_ID], references: [A_ATHLETE_ID])
+  tutor   TUTORS   @relation(fields: [ATR_TUTOR_ID], references: [T_TUTOR_ID])
+}
+
+// =============================================================================
