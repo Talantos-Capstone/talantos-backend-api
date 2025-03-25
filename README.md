@@ -9,8 +9,9 @@ npm install
 ```
 
 ## Data Model
-Schema:
 
+
+### Tables:
 - **USERS** : Represents the users in the system.
     - `U_USER_ID`: Unique ID for the user.
     - `U_EMAIL`: Email address.
@@ -105,6 +106,20 @@ Schema:
     - `ACC_APPROVED_DATE`: Approval timestamp.
     - `ACC_MODIFICATIONS`: Detailed changes made.
     - `ACC_TIMEOUT`: Whether the change has timed out.
+
+### Enums
+- **BaseUserRole** : Represents the possible roles for users.
+    - `TUTOR`
+    - `ANALYIST`
+    - `ADMIN`
+    - `USER`
+- **BaseStatus** : Represents the possible statuses for contact requests.
+    - `PENDING`
+    - `ACCEPTED`
+    - `REJECTED`
+    - `IN_PROGRESS`
+    - `COMPLETED`
+    - `CANCELED`
 
 ## Tech Stack
 
