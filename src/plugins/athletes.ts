@@ -23,6 +23,11 @@ const athletesPlugin = {
         path: '/athletes/{id}/competitions',
         handler: getAthletesHandler
       },
+      {
+        method: 'GET',
+        path: '/athletes/{id}/performance-metrics',
+        handler: getAthletesHandler
+      }
     ]);
   },
 };

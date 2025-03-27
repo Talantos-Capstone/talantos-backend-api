@@ -28,6 +28,26 @@ const tutorsPlugin = {
         path: "/tutors/{id}/athletes/{athleteId}",
         handler: getTutorsHandler,
       },
+      {
+        method: "GET",
+        path: "/tutors/{id}/athletes/{athleteId}/performance-metrics",
+        handler: getTutorsHandler,
+      },
+      {
+        method: "GET",
+        path: "/tutors/{id}/contact-requests",
+        handler: getTutorsHandler,
+      },
+      {
+        method: "GET",
+        path: "/tutors/{id}/contact-requests/{requestId}",
+        handler: getTutorsHandler,
+      },
+      {
+        method: "POST",
+        path: "/tutors/{id}/contact-requests",
+        handler: getTutorsHandler,
+      },
     ]);
   },
 };

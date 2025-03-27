@@ -1,0 +1,20 @@
+meta {
+  name: make a comp
+  type: http
+  seq: 2
+}
+
+post {
+  url: http://localhost:3000/competitions
+  body: json
+  auth: none
+}
+
+body:json {
+  {
+    "organizer": "Testerman the sequel",
+    "name": "The tester swquel",
+    "eventDate": "2024-02-31",
+    "location": "Mayaguez, PR"
+  }
+}
